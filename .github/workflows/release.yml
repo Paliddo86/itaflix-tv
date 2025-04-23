@@ -30,19 +30,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build APK
-        run: ./gradlew assembleRelease --stacktrace
-
-      - name: Sign APK
-        id: sign_apk
-        uses: r0adkll/sign-android-release@v1
-        with:
-          releaseDirectory: app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.KEYSTORE }}
-          alias: ${{ secrets.SIGNING_KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.SIGNING_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
-        env:
-          BUILD_TOOLS_VERSION: "34.0.0"
+        run: ./gradlew assembleRelease --
 
       - name: Create Release
         id: create_release
@@ -59,7 +47,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.sign_apk.outputs.signedReleaseFile }}
+          asset_path: app/build/outputs/apk/release/app-release-unsigned.apk
           asset_name: ${{ github.event.repository.name }}-${{ github.ref_name }}.apk
           asset_content_type: application/zip
 
